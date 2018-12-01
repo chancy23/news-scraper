@@ -1,0 +1,1 @@
+//articles model that will get all the scraped articles and the comments entered by users
