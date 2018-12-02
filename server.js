@@ -40,7 +40,8 @@ mongoose.connect(MONGODB_URI, { useNewUrlParser: true });
 
 //routes===========================================================
 //route to get the articles from the website (so include the axios and cheerio items)
-app.get("/scrape", function(req, res){
+// ******** works *********
+app.get("/api/articles", function(req, res){
     //axios get to the webpage to scrape
     axios.get("https://ksl.com").then(function(response) {
         //cheerios scraping tools
@@ -48,12 +49,12 @@ app.get("/scrape", function(req, res){
         var $ = cheerio.load(response.data);
         //load the headlines/titles, links to database
         $("div.headline").each(function(i, element){
-            //empty object to hold each result pair (title, link)
+            //empty object to hold each result info (title, link, summary)
             var result = {};
             //save the link and title to the object
             result.title = $(this).children().children("a").text();
             result.link = $(this).children().children("a").attr("href");
-            // console.log(JSON.stringify(result, null, 2));
+            result.summary = $(this).children("h5").text();
 
             //create new article in the db
             db.Article.create(result).then(function(dbArticle){
@@ -64,15 +65,21 @@ app.get("/scrape", function(req, res){
         });
         //send the scrape to the client
         res.send("scrape completed");
-        //make sure there are no duplicates
-        //only load new articles not every article
     })
           
 });
 
+//route to display page from handlebars
+app.get("/", function(req, res) {
+    //render index in handlebars
+    res.render("index", {});
+});
+
 //get route to display the home page display all the articles 
+//match to button click to load on button click of scrape article
+// *******works************
 app.get("/articles", function(req, res) {
-    //call the articles from teh db that were saved after the srape button was hit
+    //call the articles from the db that were saved after the srape button was hit
     db.Article.find({}).then(function(dbArticle) {
         res.json(dbArticle);
     }).catch(function(err) {
@@ -81,14 +88,50 @@ app.get("/articles", function(req, res) {
 });
 
 //post route to add comments to the selected article
-app.post("/api/comments", function(req, res){
-
+//match to frontend JS on a submit button for comments
+//**** need to test*********
+app.post("/article/:id", function(req, res) {
+    //take the comment from the front end and add to the db
+    db.Comment.create(req.body).then(function(dbComment) {
+        return db.Article.findOneAndUpdate({_id: req.params.id}, {comment: dbComment._id}, {new: true})
+        .then(function(dbArticle) {
+            // If we were able to successfully update an Article, send it back to the client
+            res.json(dbArticle);
+        }).catch(function(err){
+            res.json(err);
+        });
+    })
     //once posted reload the main page ("/"), showing comments to article
 });
 
-//update or delete route to remove comments
-app.delete("/api/comments", function(req, res){
+//route for getting an article WITH its comments
+//match to the front end based on which article div is selected
+//**** need to test*********
+app.get("/article/:id", function (req, res) {
+    //search the article table by the selected id, join with the comment table
+    db.Article.findOne({_id: req.params.id}).populate("comment")
+    .then(function(dbArticle) {
+        // if article is found then return that object
+        res.json(dbArticle);
+    }).catch(function(err){
+        res.json(err);
+    });
+});
 
+//update or delete route to remove comments from the specified article
+// ***** need to test***********
+app.delete("/comment/:id", function(req, res) {
+    //remove the comment from the comments model,
+    db.Comment.deleteOne({_id: req.params.id}).then(function(dbComment){
+        //then reload the article minus the comment
+        //not sure if need the 2nd arguement for comment on this one
+        return db.Article.findOneAndUpdate({_id: req.params.id}, {comment: dbComment._id}, {new: true})
+    }).then(function(dbArticle){
+        //return article
+        res.json(dbArticle);
+    }).catch(function(err){
+        res.json(err);
+    });
     //once posted reload the main page ("/"), showing updated (removed) comments to article
 });
 
