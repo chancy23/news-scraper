@@ -1,1 +1,0 @@
-//comments model that will be tied to the articles model
