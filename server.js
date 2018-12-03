@@ -39,9 +39,16 @@ var MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost/mongoArticleSc
 mongoose.connect(MONGODB_URI, { useNewUrlParser: true });
 
 //routes===========================================================
+//route to display page from handlebars
+app.get("/", function(req, res) {
+    //render index in handlebars
+    res.render("index", {});
+});
+
 //route to get the articles from the website (so include the axios and cheerio items)
+//this is called when the user clicks the scrape button
 // ******** works *********
-app.get("/api/articles", function(req, res){
+app.get("/scrape", function(req, res){
     //axios get to the webpage to scrape
     axios.get("https://ksl.com").then(function(response) {
         //cheerios scraping tools
@@ -59,29 +66,22 @@ app.get("/api/articles", function(req, res){
             //create new article in the db
             db.Article.create(result).then(function(dbArticle){
                 console.log(dbArticle);
+                return dbArticle;
             }).catch(function(err){
                 console.log(err);
             });
         });
         //send the scrape to the client
-        res.send("scrape completed");
-    })
-          
+        res.render("Scrape Completed!");
+    });    
 });
 
-//route to display page from handlebars
-app.get("/", function(req, res) {
-    //render index in handlebars
-    res.render("index", {});
-});
-
-//get route to display the home page display all the articles 
-//match to button click to load on button click of scrape article
-// *******works************
+//get route to display articles page with all the articles with comments
 app.get("/articles", function(req, res) {
     //call the articles from the db that were saved after the srape button was hit
-    db.Article.find({}).then(function(dbArticle) {
-        res.json(dbArticle);
+    db.Article.find({}).populate("comment").then(function(dbArticle) {
+        var dbArticlesObj = {articles: dbArticle}
+        res.render("articles", dbArticlesObj);
     }).catch(function(err) {
         res.json(err);
     });
@@ -89,7 +89,7 @@ app.get("/articles", function(req, res) {
 
 //post route to add comments to the selected article
 //match to frontend JS on a submit button for comments
-//**** need to test*********
+//**** working, but overwrites the previous comments, how to get more than one to save to each article?*********
 app.post("/article/:id", function(req, res) {
     //take the comment from the front end and add to the db
     db.Comment.create(req.body).then(function(dbComment) {
@@ -100,11 +100,10 @@ app.post("/article/:id", function(req, res) {
         }).catch(function(err){
             res.json(err);
         });
-    })
-    //once posted reload the main page ("/"), showing comments to article
+    });
 });
 
-//route for getting an article WITH its comments
+//route for getting a specific article WITH its comments
 //match to the front end based on which article div is selected
 //**** need to test*********
 app.get("/article/:id", function (req, res) {

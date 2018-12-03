@@ -8,7 +8,8 @@ var Schema = mongoose.Schema;
 //create schema object for this model
 var CommentSchema = new Schema ({
     comment: {
-        type: String
+        type: String,
+        unique: true
     }
 });
 

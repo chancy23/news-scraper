@@ -1,0 +1,49 @@
+
+<div class="container">
+
+    <div class="row">
+        {{!-- else display the scraped articles, each in its own div --}}
+        <div class="col s12" id="articlesDisplay">
+            {{#each articles}}
+            <div data-article="{{this.id}}">
+                <h5>{{this.title}}</h5>
+                <p>{{this.summary}}</p>
+                <p><a href="https://www.ksl.com{{this.link}}">Link to Article</a></p>
+                {{!-- expand section to add a comment and show prev comments (with delete option) --}}
+                <ul class="collapsible">
+                    <li>
+                        <div class="collapsible-header">Comments</div>
+                        <div class="collapsible-body">
+                            {{!-- place to add a new comment --}}
+                            <div class="row">
+                                <form class="col s10">
+                                    <div class="row">
+                                        <div class="input-field col s10">
+                                            <textarea class="materialize-textarea commentText"></textarea>
+                                            <label for="commentText">Add a Comment</label>
+                                        </div>
+                                        <div class="col s2">
+                                            {{!-- add the article id from the DB to know what to tie comment too --}}
+                                            <a class="waves-effect waves-light btn addComment" id="{{this.id}}">Add Comment</a>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                            {{!-- shows all comments added to the article plus a delete button, 
+                                use #each to loop through each comment in db and display --}}
+                            <div class="row">
+                                <div class="col s8">
+                                    <p class="commentDetail">This is a test comment added to an article</p>
+                                </div>
+                                <div class="col s2">
+                                    <a class="waves-effect waves-light btn delete">Delete</a>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            {{/each}}
+        </div>
+    </div>
+</div>
