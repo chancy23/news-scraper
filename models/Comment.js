@@ -7,10 +7,7 @@ var Schema = mongoose.Schema;
 
 //create schema object for this model
 var CommentSchema = new Schema ({
-    comment: {
-        type: String,
-        unique: true
-    }
+    body: String,
 });
 
 //create model from schema

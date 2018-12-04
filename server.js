@@ -40,10 +40,10 @@ mongoose.connect(MONGODB_URI, { useNewUrlParser: true });
 
 //routes===========================================================
 //route to display page from handlebars
-app.get("/", function(req, res) {
-    //render index in handlebars
-    res.render("index", {});
-});
+// app.get("/", function(req, res) {
+//     //render index in handlebars
+//     res.render("index", {});
+// });
 
 //route to get the articles from the website (so include the axios and cheerio items)
 //this is called when the user clicks the scrape button
@@ -77,11 +77,11 @@ app.get("/scrape", function(req, res){
 });
 
 //get route to display articles page with all the articles with comments
-app.get("/articles", function(req, res) {
+app.get("/", function(req, res) {
     //call the articles from the db that were saved after the srape button was hit
     db.Article.find({}).populate("comment").then(function(dbArticle) {
         var dbArticlesObj = {articles: dbArticle}
-        res.render("articles", dbArticlesObj);
+        res.render("index", dbArticlesObj);
     }).catch(function(err) {
         res.json(err);
     });
@@ -90,10 +90,10 @@ app.get("/articles", function(req, res) {
 //post route to add comments to the selected article
 //match to frontend JS on a submit button for comments
 //**** working, but overwrites the previous comments, how to get more than one to save to each article?*********
-app.post("/article/:id", function(req, res) {
+app.post("/:articleId", function(req, res) {
     //take the comment from the front end and add to the db
     db.Comment.create(req.body).then(function(dbComment) {
-        return db.Article.findOneAndUpdate({_id: req.params.id}, {comment: dbComment._id}, {new: true})
+        return db.Article.findOneAndUpdate({_id: req.params.articleId}, {comment: dbComment._id}, {new: true})
         .then(function(dbArticle) {
             // If we were able to successfully update an Article, send it back to the client
             res.json(dbArticle);
@@ -119,9 +119,9 @@ app.get("/article/:id", function (req, res) {
 
 //update or delete route to remove comments from the specified article
 // ***** need to test***********
-app.delete("/comment/:id", function(req, res) {
+app.delete("/:commentId", function(req, res) {
     //remove the comment from the comments model,
-    db.Comment.deleteOne({_id: req.params.id}).then(function(dbComment){
+    db.Comment.deleteOne({_id: req.params.commentId}).then(function(dbComment){
         //then reload the article minus the comment
         //not sure if need the 2nd arguement for comment on this one
         return db.Article.findOneAndUpdate({_id: req.params.id}, {comment: dbComment._id}, {new: true})
