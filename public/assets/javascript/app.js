@@ -3,16 +3,19 @@ $(document).ready(function(){
     $(".collapsible").collapsible();
 
     //on click to scrape articles
-    $(".scrape").on("click", function(event){
+    $("#scrape").on("click", function(event){
         event.preventDefault();
         //call to the server file to initiate the scrape
         $.get("/scrape", function(data){
+            //its not logging the console or reloading page, but you can do a manual refresh and the articles are there
             console.log("scraped ", data) 
-            // return data;  
-            // location.reload(); 
+            location.reload();  
         });
-        //load the articles page after scrape (need to verify it is finishing the scrap first)
-        // location.reload(); 
+        // $("#container").load("/", "#articleDisplay", function() {
+        //     console.log("page was loaded");
+            
+        // });
+        // location.reload();
     });
 
 
@@ -30,14 +33,13 @@ $(document).ready(function(){
         console.log("article id ", articleId);
 
         //run post method to save to the db>comments table
-        $.post("/" + articleId, commentObj, function(data){
-            console.log(data); //shows the article db item
-            
-            //clear input field (not needed if page or div reloads)
-            $(".commentText").empty();
+        $.post("/" + articleId, commentObj, function(dbArticle){
+            console.log(dbArticle, articleId, commentObj); //shows the article db item
             //then push the comment to the display section on page reload
-            // location.reload();
+            location.reload();
+            
         });
+       
     });
 
     //on click for delete button
@@ -52,6 +54,7 @@ $(document).ready(function(){
         }).then(function(data) {
             console.log("data ", data);
             //reload the page to update comment section
+            location.reload();
         });
     });
 

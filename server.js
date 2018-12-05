@@ -3,7 +3,6 @@ var express = require("express");
 var logger = require("morgan");
 var mongoose = require("mongoose");
 
-
 //scraping tools
 var axios = require("axios");
 var cheerio = require("cheerio");
@@ -39,22 +38,16 @@ var MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost/mongoArticleSc
 mongoose.connect(MONGODB_URI, { useNewUrlParser: true });
 
 //routes===========================================================
-//route to display page from handlebars
-// app.get("/", function(req, res) {
-//     //render index in handlebars
-//     res.render("index", {});
-// });
 
 //route to get the articles from the website (so include the axios and cheerio items)
 //this is called when the user clicks the scrape button
-// ******** works *********
 app.get("/scrape", function(req, res){
     //axios get to the webpage to scrape
     axios.get("https://ksl.com").then(function(response) {
         //cheerios scraping tools
         // Then, we load that into cheerio and save it to $ for a shorthand selector
         var $ = cheerio.load(response.data);
-        //load the headlines/titles, links to database
+        //load the headlines, summaries, links to database
         $("div.headline").each(function(i, element){
             //empty object to hold each result info (title, link, summary)
             var result = {};
@@ -71,12 +64,10 @@ app.get("/scrape", function(req, res){
                 console.log(err);
             });
         });
-        //send the scrape to the client
-        res.render("Scrape Completed!");
     });    
 });
 
-//get route to display articles page with all the articles with comments
+//get route to display the page with all the articles with comments
 app.get("/", function(req, res) {
     //call the articles from the db that were saved after the srape button was hit
     db.Article.find({}).populate("comment").then(function(dbArticle) {
@@ -91,6 +82,7 @@ app.get("/", function(req, res) {
 //match to frontend JS on a submit button for comments
 //**** working, but overwrites the previous comments, how to get more than one to save to each article?*********
 app.post("/:articleId", function(req, res) {
+    console.log("req.body", req.url);
     //take the comment from the front end and add to the db
     db.Comment.create(req.body).then(function(dbComment) {
         return db.Article.findOneAndUpdate({_id: req.params.articleId}, {comment: dbComment._id}, {new: true})
@@ -106,19 +98,19 @@ app.post("/:articleId", function(req, res) {
 //route for getting a specific article WITH its comments
 //match to the front end based on which article div is selected
 //**** need to test*********
-app.get("/article/:id", function (req, res) {
-    //search the article table by the selected id, join with the comment table
-    db.Article.findOne({_id: req.params.id}).populate("comment")
-    .then(function(dbArticle) {
-        // if article is found then return that object
-        res.json(dbArticle);
-    }).catch(function(err){
-        res.json(err);
-    });
-});
+// app.get("/article/:id", function (req, res) {
+//     //search the article table by the selected id, join with the comment table
+//     db.Article.findOne({_id: req.params.id}).populate("comment")
+//     .then(function(dbArticle) {
+//         // if article is found then return that object
+//         res.json(dbArticle);
+//     }).catch(function(err){
+//         res.json(err);
+//     });
+// });
 
-//update or delete route to remove comments from the specified article
-// ***** need to test***********
+//delete route to remove comments from the specified article
+// ***** working***********
 app.delete("/:commentId", function(req, res) {
     //remove the comment from the comments model,
     db.Comment.deleteOne({_id: req.params.commentId}).then(function(dbComment){
@@ -131,7 +123,6 @@ app.delete("/:commentId", function(req, res) {
     }).catch(function(err){
         res.json(err);
     });
-    //once posted reload the main page ("/"), showing updated (removed) comments to article
 });
 
 
