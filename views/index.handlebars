@@ -20,17 +20,14 @@
                     <li>
                         <div class="collapsible-header">Comments</div>
                         <div class="collapsible-body">
-                            {{!-- place to add a new comment --}}
+                            {{!-- form to add a new comment --}}
                             <div class="row">
                                 <form class="col s10">
                                     <div class="row">
-                                        <div class="input-field col s10">
-                                            <textarea class="materialize-textarea commentText" data-id="{{this.id}}"></textarea>
+                                        <div class="input-field col s8">
+                                            <textarea class="materialize-textarea" id="commentText{{this.id}}"></textarea>
                                             <label for="commentText">Add a Comment</label>
-                                        </div>
-                                        <div class="col s2">
-                                            {{!-- add the article id from the DB to know what to tie comment too --}}
-                                            <a class="waves-effect waves-light btn addComment" data-id="{{this.id}}">Add Comment</a>
+                                            <button class="btn waves-effect waves-light addComment" type="submit" data-id="{{this.id}}">Add Comment</button>
                                         </div>
                                     </div>
                                 </form>

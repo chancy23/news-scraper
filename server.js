@@ -56,13 +56,31 @@ app.get("/scrape", function(req, res){
             result.link = $(this).children().children("a").attr("href");
             result.summary = $(this).children("h5").text();
 
-            //create new article in the db
-            db.Article.create(result).then(function(dbArticle){
-                console.log(dbArticle);
-                return dbArticle;
-            }).catch(function(err){
-                console.log(err);
+            //check if article already exists don't add it to the db if it is already in there
+            db.Article.find({title: result.title}).exec(function(err, doc){
+                if(doc.length) {
+                    console.log("Article Already Exists")
+                }
+                else {
+                    //create new article in the db
+                    db.Article.create(result).then(function(dbArticle){
+                    console.log(dbArticle);
+                    return dbArticle;
+                    }).catch(function(err){
+                    console.log(err);
+                    });
+                }
             });
+        
+            
+            //create new article in the db
+            // db.Article.create(result).then(function(dbArticle){
+            //     console.log(dbArticle);
+            //     return dbArticle;
+            // }).catch(function(err){
+            //     console.log(err);
+            // });
+
         });
     });    
 });
@@ -82,7 +100,7 @@ app.get("/", function(req, res) {
 //match to frontend JS on a submit button for comments
 //**** working, but overwrites the previous comments, how to get more than one to save to each article?*********
 app.post("/:articleId", function(req, res) {
-    console.log("req.body", req.url);
+    console.log("Comment", req.body);
     //take the comment from the front end and add to the db
     db.Comment.create(req.body).then(function(dbComment) {
         return db.Article.findOneAndUpdate({_id: req.params.articleId}, {comment: dbComment._id}, {new: true})
