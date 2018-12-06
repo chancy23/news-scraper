@@ -71,16 +71,6 @@ app.get("/scrape", function(req, res){
                     });
                 }
             });
-        
-            
-            //create new article in the db
-            // db.Article.create(result).then(function(dbArticle){
-            //     console.log(dbArticle);
-            //     return dbArticle;
-            // }).catch(function(err){
-            //     console.log(err);
-            // });
-
         });
     });    
 });
