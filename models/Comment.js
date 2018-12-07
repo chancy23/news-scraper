@@ -7,7 +7,10 @@ var Schema = mongoose.Schema;
 
 //create schema object for this model
 var CommentSchema = new Schema ({
-    body: String,
+    body: {
+    type: String,
+    minlength: [1, 'at least 1 character required']
+    }
 });
 
 //create model from schema

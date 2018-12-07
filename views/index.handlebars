@@ -1,9 +1,7 @@
 <nav>
     <div class="nav-wrapper">
         <a href="/" class="brand-logo">Local News Scraper</a>
-        {{!-- <ul id="nav-mobile" class="right hide-on-med-and-down"> --}}
-            <button class="btn waves-effect waves-light right" type="submit" id="scrape">Scrape Articles</button>
-        {{!-- </ul> --}}
+        <button class="btn waves-effect waves-light right" type="submit" id="scrape">Scrape Articles</button>
     </div>
 </nav>
 
@@ -15,26 +13,14 @@
             {{#each articles}}
             <div class="articleDiv">
                 <h5>{{this.title}}</h5>
-                <p>{{this.summary}}<br>
-                <a href="https://www.ksl.com{{this.link}}" target="_blank">View Article</a></p>
+                <p>{{this.summary}}</p>
+                <p class="center"><a href="https://www.ksl.com{{this.link}}" target="_blank">View Article</a></p>
                 {{!-- expand section to add a comment and show prev comments (with delete option) --}}
                 <ul class="collapsible">
                     <li>
                         <div class="collapsible-header">Comments</div>
                         <div class="collapsible-body">
-                            {{!-- form to add a new comment --}}
-                            <div class="row">
-                                <form class="col s10">
-                                    <div class="row">
-                                        <div class="input-field col s8">
-                                            <textarea class="materialize-textarea" id="commentText{{this.id}}"></textarea>
-                                            <label for="commentText">Add a Comment</label>
-                                            <button class="btn waves-effect waves-light addComment" type="submit" data-id="{{this.id}}">Add Comment</button>
-                                        </div>
-                                    </div>
-                                </form>
-                            </div>
-                            {{!-- shows all comments added to the article plus a delete button, 
+                            {{!-- shows all comments added to the article plus a delete button,
                             use #each to loop through each comment in db and display --}}
                             {{!-- {{#each comment}} --}}
 
@@ -50,7 +36,30 @@
                                 </div>
                             </div>
                             {{/if}}
+
+                            {{#unless comment._id}}
+                            <div class="row">
+                                <div class="col s8">
+                                    {{!-- for now just show the one comment --}}
+                                    <p class="commentDetail">There are currently no comments for this article.</p>
+                                </div>
+                            </div>
+                            {{/unless}}
                             {{!-- {{/each}} --}}
+
+                            {{!-- form to add a new comment --}}
+                            <div class="row">
+                                <form class="col s10">
+                                    <div class="row">
+                                        <div class="input-field col s12">
+                                            <textarea class="materialize-textarea" id="commentText{{this.id}}"></textarea>
+                                            <label for="commentText">Add a Comment</label>
+                                            <button class="btn waves-effect waves-light addComment" type="submit"
+                                                data-id="{{this.id}}">Add Comment</button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
                         </div>
                     </li>
                 </ul>
@@ -64,9 +73,20 @@
     <div class="row">
         <div class="col s12" id="defaultDisplay">
             <h4>Uh-oh, it looks like you don't have anything to read!</h4>
-            <p>To fix that, click the Scrape Articles button to get started</p>
+            <p>To fix that, click the Scrape Articles button above.</p>
         </div>
     </div>
     {{/unless}}
-    
+
+    {{!-- modal for empty comment --}}
+    <div id="commentError" class="modal">
+        <div class="modal-content">
+            <h4>Oops!</h4>
+            <p>Please have at least one character in your comment.</p>
+        </div>
+        <div class="modal-footer">
+            <a href="#!" class="modal-close waves-effect waves-green btn-flat">Ok</a>
+        </div>
+    </div>
+
 </div>

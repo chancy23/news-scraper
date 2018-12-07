@@ -1,5 +1,12 @@
+@import url('https://fonts.googleapis.com/css?family=Libre+Baskerville');
+
 body {
     background-image: url("/assets/images/newspaper_bgi.jpg");
+    font-family: 'Libre Baskerville', serif;
+}
+
+nav {
+    background-color: #260301;
 }
 
 .container {
@@ -21,11 +28,11 @@ body {
 
 .articleDiv,
 #defaultDisplay {
-    background-color: rgb(235, 235, 235);
+    background-color: #F2EBDC;
 }
 
 .collapsible-body {
-    background-color: rgb(255, 255, 255);
+    background-color: #FFF;
 }
 
 h5 {
@@ -37,5 +44,43 @@ p {
 }
 
 .btn {
-    background-color: red;
+    background-color: #750B0D;
+    font-family: 'Libre Baskerville', serif;
+    font-size: 12px;
+}
+
+.btn:hover,
+.btn:focus {
+    background-color: #C0977A;
+}
+
+textarea.materialize-textarea:focus:not([readonly]) {
+    border-bottom: 1px solid #750B0D;
+    box-shadow: 0 1px 0 0 #750B0D;
+}
+
+textarea.materialize-textarea:focus:not([readonly])+label {
+    color: #750B0D;
+}
+
+/* adjust mobile responsiveness */
+@media only screen and (max-width: 411px) {
+    nav .brand-logo {
+        font-size: 1.25rem;
+    }
+}
+
+@media only screen and (max-width: 768px) {
+    .container {
+        width: 95%;
+    }
+}
+
+@media only screen and (max-width: 992px) {
+    nav .brand-logo {
+        left: 25%;
+    }
+    #scrape {
+        margin-top: 2.5%;
+    }
 }

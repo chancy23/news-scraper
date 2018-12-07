@@ -1,6 +1,7 @@
 $(document).ready(function(){
     //initializations for materialize
     $(".collapsible").collapsible();
+    $(".modal").modal();
 
     //on click to scrape articles
     $("#scrape").on("click", function(event){
@@ -19,20 +20,26 @@ $(document).ready(function(){
         event.preventDefault();
         //get the id for the article off of the add comment button clicked
         var articleId = $(this).attr("data-id");
-        var commentObj = {
-            body: $("#commentText" + articleId).val().trim()
+        //validate there is at least one character
+        if ($("#commentText" + articleId).val() === "") {
+            $("#commentError").modal("open");
+        }
+        else {
+            var commentObj = {
+                body: $("#commentText" + articleId).val().trim()
+            };
+
+            //testing
+            // console.log("commentObj: ", JSON.stringify(commentObj, null, 2));
+            // console.log("article id ", articleId);
+
+            //run post method to save to the db>comments table
+            $.post("/" + articleId, commentObj, function(dbArticle){
+                console.log(dbArticle, commentObj); //shows the article db item
+                //then push the comment to the display section on page reload
+                location.reload();
+            });
         };
-
-        //testing
-        // console.log("commentObj: ", JSON.stringify(commentObj, null, 2));
-        // console.log("article id ", articleId);
-
-        //run post method to save to the db>comments table
-        $.post("/" + articleId, commentObj, function(dbArticle){
-            console.log(dbArticle, commentObj); //shows the article db item
-            //then push the comment to the display section on page reload
-            location.reload();
-        });
     });
 
     //on click for delete button
