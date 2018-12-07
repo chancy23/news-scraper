@@ -5,17 +5,12 @@ $(document).ready(function(){
     //on click to scrape articles
     $("#scrape").on("click", function(event){
         event.preventDefault();
-        //call to the server file to initiate the scrape
-        $.get("/scrape", function(data){
+        //call to the server file to initiate the scrape/rescrape
+        $.get("/scrape", function(dbArticle){
             //its not logging the console or reloading page, but you can do a manual refresh and the articles are there
-            console.log("scraped ", data) 
-            location.reload();  
-        });
-        // $("#container").load("/", "#articleDisplay", function() {
-        //     console.log("page was loaded");
-            
-        // });
-        // location.reload();
+            console.log("scraped ", dbArticle);
+            location.reload();
+        }); 
     });
 
 

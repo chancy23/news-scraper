@@ -59,16 +59,25 @@ app.get("/scrape", function(req, res){
             //check if article already exists don't add it to the db if it is already in there
             db.Article.find({title: result.title}).exec(function(err, doc){
                 if(doc.length) {
-                    console.log("Article Already Exists")
+                    console.log("Article Already Exists");
+                    //stops the server call once check is done(however only loads one new article if there are more than one, when placed here)
+                    // res.end();
                 }
                 else {
                     //create new article in the db
-                    db.Article.create(result).then(function(dbArticle){
-                    console.log(dbArticle);
-                    return dbArticle;
+                    db.Article.create(result)/*.then(function(dbArticle){
+                        console.log(dbArticle);
+                        return dbArticle;
+                    })*/.then(function(dbArticle){
+                        console.log(dbArticle);
+                        //this allows the page to refresh after scrape and all new articles display, but am getting an error in terminal???
+                        //Error [ERR_HTTP_HEADERS_SENT]: Cannot set headers after they are sent to the client
+                        res.json(dbArticle); 
                     }).catch(function(err){
-                    console.log(err);
+                        console.log(err);
                     });
+                    //doesn't do anything here
+                    // res.end();
                 }
             });
         });
@@ -87,7 +96,7 @@ app.get("/", function(req, res) {
 });
 
 //post route to add comments to the selected article
-//match to frontend JS on a submit button for comments
+//match to frontend JS on a add button for comments
 //**** working, but overwrites the previous comments, how to get more than one to save to each article?*********
 app.post("/:articleId", function(req, res) {
     console.log("Comment", req.body);
@@ -103,22 +112,7 @@ app.post("/:articleId", function(req, res) {
     });
 });
 
-//route for getting a specific article WITH its comments
-//match to the front end based on which article div is selected
-//**** need to test*********
-// app.get("/article/:id", function (req, res) {
-//     //search the article table by the selected id, join with the comment table
-//     db.Article.findOne({_id: req.params.id}).populate("comment")
-//     .then(function(dbArticle) {
-//         // if article is found then return that object
-//         res.json(dbArticle);
-//     }).catch(function(err){
-//         res.json(err);
-//     });
-// });
-
 //delete route to remove comments from the specified article
-// ***** working***********
 app.delete("/:commentId", function(req, res) {
     //remove the comment from the comments model,
     db.Comment.deleteOne({_id: req.params.commentId}).then(function(dbComment){
@@ -132,7 +126,6 @@ app.delete("/:commentId", function(req, res) {
         res.json(err);
     });
 });
-
 
 //set the server listening
 app.listen(PORT, function(){

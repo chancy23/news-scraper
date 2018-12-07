@@ -1,3 +1,41 @@
+body {
+    background-image: url("/assets/images/newspaper_bgi.jpg");
+}
+
+.container {
+    width: 60%
+}
+
 .brand-logo {
     margin-left: 1%;
+}
+
+#scrape {
+    margin-right: 1%;
+    margin-top: 1%;
+}
+
+#defaultDisplay {
+    margin-top: 3%;
+}
+
+.articleDiv,
+#defaultDisplay {
+    background-color: rgb(235, 235, 235);
+}
+
+.collapsible-body {
+    background-color: rgb(255, 255, 255);
+}
+
+h5 {
+    padding: 1% 1% 0% 1%;
+}
+
+p {
+    padding: 0% 1% 1% 1%;
+}
+
+.btn {
+    background-color: red;
 }

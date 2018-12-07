@@ -1,20 +1,22 @@
+<nav>
+    <div class="nav-wrapper">
+        <a href="/" class="brand-logo">Local News Scraper</a>
+        {{!-- <ul id="nav-mobile" class="right hide-on-med-and-down"> --}}
+            <button class="btn waves-effect waves-light right" type="submit" id="scrape">Scrape Articles</button>
+        {{!-- </ul> --}}
+    </div>
+</nav>
+
 <div class="container">
-    {{!-- if no articles are scraped display this div showing button to scrape and a message --}}
-    {{!-- <div class="row">
-        <div class="col s12" id="defaultDisplay">
-            <h4>Oops looks like you don't have anything to read!</h4>
-            <p>To fix that, click the Scrape button to get started</p>
-        </div>
-    </div> --}}
-    
+    {{#if articles}}
     <div class="row">
         {{!-- else display the scraped articles, each in its own div --}}
         <div class="col s12" id="articlesDisplay">
             {{#each articles}}
-            <div>
+            <div class="articleDiv">
                 <h5>{{this.title}}</h5>
-                <p>{{this.summary}}</p>
-                <p><a href="https://www.ksl.com{{this.link}}">Link to Article</a></p>
+                <p>{{this.summary}}<br>
+                <a href="https://www.ksl.com{{this.link}}" target="_blank">View Article</a></p>
                 {{!-- expand section to add a comment and show prev comments (with delete option) --}}
                 <ul class="collapsible">
                     <li>
@@ -56,4 +58,15 @@
             {{/each}}
         </div>
     </div>
+    {{/if}}
+
+    {{#unless articles}}
+    <div class="row">
+        <div class="col s12" id="defaultDisplay">
+            <h4>Uh-oh, it looks like you don't have anything to read!</h4>
+            <p>To fix that, click the Scrape Articles button to get started</p>
+        </div>
+    </div>
+    {{/unless}}
+    
 </div>
