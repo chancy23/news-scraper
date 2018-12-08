@@ -30,11 +30,9 @@ var exphbs = require("express-handlebars");
 app.engine("handlebars", exphbs({ defaultLayout: "main" }));
 app.set("view engine", "handlebars");
 
-
 // Connect to the Mongo DB
 // If deployed, use the deployed database. Otherwise use the local mongoHeadlines database
 var MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost/mongoArticleScraper" 
-
 mongoose.connect(MONGODB_URI, { useNewUrlParser: true });
 
 //routes===========================================================
@@ -44,19 +42,16 @@ mongoose.connect(MONGODB_URI, { useNewUrlParser: true });
 app.get("/scrape", function(req, res){
     //axios get to the webpage to scrape
     axios.get("https://ksl.com").then(function(response) {
-        //cheerios scraping tools
-        // Then, we load that into cheerio and save it to $ for a shorthand selector
+        //cheerios scraping
         var $ = cheerio.load(response.data);
-        //load the headlines, summaries, links to database
         $("div.headline").each(function(i, element){
             //empty object to hold each result info (title, link, summary)
             var result = {};
-            //save the link and title to the object
             result.title = $(this).children().children("a").text();
             result.link = $(this).children().children("a").attr("href");
             result.summary = $(this).children("h5").text();
 
-            //check if article already exists don't add it to the db if it is already in there
+            //check if article already exists in our db
             db.Article.find({title: result.title}).exec(function(err, doc){
                 if(doc.length) {
                     console.log("Article Already Exists");
@@ -65,10 +60,7 @@ app.get("/scrape", function(req, res){
                 }
                 else {
                     //create new article in the db
-                    db.Article.create(result)/*.then(function(dbArticle){
-                        console.log(dbArticle);
-                        return dbArticle;
-                    })*/.then(function(dbArticle){
+                    db.Article.create(result).then(function(dbArticle){
                         console.log(dbArticle);
                         //this allows the page to refresh after scrape and all new articles display, but am getting an error in terminal???
                         //Error [ERR_HTTP_HEADERS_SENT]: Cannot set headers after they are sent to the client
@@ -84,7 +76,6 @@ app.get("/scrape", function(req, res){
     });    
 });
 
-//get route to display the page with all the articles with comments
 app.get("/", function(req, res) {
     //call the articles from the db that were saved after the srape button was hit
     db.Article.find({}).populate("comment").then(function(dbArticle) {
@@ -95,8 +86,6 @@ app.get("/", function(req, res) {
     });
 });
 
-//post route to add comments to the selected article
-//match to frontend JS on a add button for comments
 //**** working, but overwrites the previous comments, how to get more than one to save to each article?*********
 app.post("/:articleId", function(req, res) {
     console.log("Comment", req.body);
@@ -112,15 +101,13 @@ app.post("/:articleId", function(req, res) {
     });
 });
 
-//delete route to remove comments from the specified article
 app.delete("/:commentId", function(req, res) {
     //remove the comment from the comments model,
     db.Comment.deleteOne({_id: req.params.commentId}).then(function(dbComment){
-        //then reload the article minus the comment
-        //not sure if need the 2nd arguement for comment on this one
-        return db.Article.findOneAndUpdate({_id: req.params.id}, {comment: dbComment._id}, {new: true})
+        //then return the article, updated
+        return db.Article.findOneAndUpdate({_id: req.params.id}, {new: true})
     }).then(function(dbArticle){
-        //return article
+        // send the article back to the front end
         res.json(dbArticle);
     }).catch(function(err){
         res.json(err);
